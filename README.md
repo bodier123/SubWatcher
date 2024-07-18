@@ -4,7 +4,7 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/SubWatcher.git
+   git clone https://github.com/bodier123/SubWatcher.git
    cd SubWatcher
    ```
 
@@ -19,7 +19,7 @@ SubWatcher supports multiple input methods and output options:
 
 1. Command-line arguments:
    ```bash
-   python subwatcher.py example.com example.org --stdout
+   python subwatcher.py google.com facebook.com --stdout
    ```
 
 2. File input:
@@ -29,17 +29,17 @@ SubWatcher supports multiple input methods and output options:
 
 3. Piped input:
    ```bash
-   echo "example.com" | python subwatcher.py --stdout
+   echo "google.com" | python subwatcher.py --stdout
    ```
 
 4. Output to file:
    ```bash
-   python subwatcher.py example.com -o results.txt
+   python subwatcher.py google.com -o results.txt
    ```
 
 You can combine these methods:
 ```bash
-echo "example.net" | python subwatcher.py example.com -f more_domains.txt -o results.txt --stdout --telegram
+echo "google.com" | python subwatcher.py facebook.com -f more_domains.txt -o results.txt --stdout --telegram
 ```
 
 ### Command-line Arguments
