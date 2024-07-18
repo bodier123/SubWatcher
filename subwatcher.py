@@ -94,10 +94,14 @@ if __name__ == "__main__":
     
     if args.telegram and (not telegram_token or not chat_id):
         print("Error: TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables are required for Telegram output.")
-       exit(1)
+        exit(1)
     
     if args.rabbitmq and not rabbitmq_url:
         print("Error: RABBITMQ_URL environment variable is required for RabbitMQ output.")
         exit(1)
     
-    asyncio.run(main(args.domain, telegram_token, chat_id, args.stdout, args.telegram, args.rabbitmq, rabbitmq_url)) 
+    if not (args.stdout or args.telegram or args.rabbitmq):
+        print("Error: At least one output method (--stdout, --telegram, or --rabbitmq) must be specified.")
+        exit(1)
+    
+    asyncio.run(main(args.domain, telegram_token, chat_id, args.stdout, args.telegram, args.rabbitmq, rabbitmq_url))
