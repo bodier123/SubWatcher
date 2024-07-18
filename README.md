@@ -1,5 +1,7 @@
 # SubWatcher
 
+asynchronous Python tool for real-time subdomain monitoring. Utilizes certificate transparency logs, performs DNS resolution, and supports multiple output methods (stdout, Telegram, RabbitMQ)
+
 ## Setup
 
 1. Clone the repository:
@@ -60,8 +62,6 @@ When using Telegram or RabbitMQ outputs, set the following environment variables
 - `RABBITMQ_URL`: The URL of your RabbitMQ server
 
 ## Docker Support
-
-SubWatcher can be easily run using Docker.
 
 ### Prerequisites
 
