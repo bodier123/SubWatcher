@@ -4,7 +4,7 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/SubWatcher.git
+   git clone https://github.com/bodier123/SubWatcher.git
    cd SubWatcher
    ```
 
