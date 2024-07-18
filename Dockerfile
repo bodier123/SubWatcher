@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 80
 
 # Run subwatcher.py when the container launches
-CMD ["python", "./subwatcher.py"]
+ENTRYPOINT ["python", "subwatcher.py"]

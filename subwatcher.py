@@ -4,6 +4,7 @@ import aiohttp
 import aiodns
 import os
 import json
+import sys
 from telegram import Bot
 import pika
 
@@ -74,34 +75,50 @@ class SubWatcher:
         
         return len(new_subdomains)
 
-async def main(domain, telegram_token, chat_id, use_stdout, use_telegram, use_rabbitmq, rabbitmq_url):
-    watcher = SubWatcher(domain, telegram_token, chat_id, use_stdout, use_telegram, use_rabbitmq, rabbitmq_url)
-    new_subdomains_count = await watcher.check_subdomains()
-    print(f"Found {new_subdomains_count} new subdomains for {domain}")
+async def process_domains(domains, telegram_token, chat_id, use_stdout, use_telegram, use_rabbitmq, rabbitmq_url, output_file):
+    for domain in domains:
+        watcher = SubWatcher(domain, telegram_token, chat_id, use_stdout, use_telegram, use_rabbitmq, rabbitmq_url)
+        new_subdomains_count = await watcher.check_subdomains()
+        result = f"Found {new_subdomains_count} new subdomains for {domain}"
+        print(result)
+        if output_file:
+            with open(output_file, 'a') as f:
+                f.write(result + '\n')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Monitor subdomains and send notifications")
-    parser.add_argument("domain", help="Domain to monitor")
+    parser.add_argument("domains", nargs="*", help="Domains to monitor")
+    parser.add_argument("-f", "--file", help="File containing list of domains")
     parser.add_argument("--stdout", action="store_true", help="Output to stdout")
     parser.add_argument("--telegram", action="store_true", help="Send notifications via Telegram")
     parser.add_argument("--rabbitmq", action="store_true", help="Send results to RabbitMQ")
+    parser.add_argument("-o", "--output", help="Output file for results")
     
     args = parser.parse_args()
     
+    domains = args.domains
+
+    if args.file:
+        with open(args.file, 'r') as f:
+            domains.extend(f.read().splitlines())
+
+    if not sys.stdin.isatty():
+        domains.extend(sys.stdin.read().splitlines())
+
+    if not domains:
+        parser.error("No domains provided. Use command-line arguments, -f/--file, or pipe input.")
+
     telegram_token = os.environ.get('TELEGRAM_BOT_TOKEN')
     chat_id = os.environ.get('TELEGRAM_CHAT_ID')
     rabbitmq_url = os.environ.get('RABBITMQ_URL')
     
     if args.telegram and (not telegram_token or not chat_id):
-        print("Error: TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables are required for Telegram output.")
-        exit(1)
+        parser.error("TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID environment variables are required for Telegram output.")
     
     if args.rabbitmq and not rabbitmq_url:
-        print("Error: RABBITMQ_URL environment variable is required for RabbitMQ output.")
-        exit(1)
+        parser.error("RABBITMQ_URL environment variable is required for RabbitMQ output.")
     
-    if not (args.stdout or args.telegram or args.rabbitmq):
-        print("Error: At least one output method (--stdout, --telegram, or --rabbitmq) must be specified.")
-        exit(1)
+    if not (args.stdout or args.telegram or args.rabbitmq or args.output):
+        parser.error("At least one output method (--stdout, --telegram, --rabbitmq, or -o/--output) must be specified.")
     
-    asyncio.run(main(args.domain, telegram_token, chat_id, args.stdout, args.telegram, args.rabbitmq, rabbitmq_url))
+    asyncio.run(process_domains(domains, telegram_token, chat_id, args.stdout, args.telegram, args.rabbitmq, rabbitmq_url, args.output))

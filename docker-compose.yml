@@ -7,7 +7,10 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
       - RABBITMQ_URL=amqp://rabbitmq
-    command: python ./subwatcher.py ${DOMAIN} --stdout --telegram --rabbitmq
+    volumes:
+      - ./:/usr/src/app
+    # The command will be provided when running docker-compose
+    entrypoint: ["python", "subwatcher.py"]
     depends_on:
       - rabbitmq
 
