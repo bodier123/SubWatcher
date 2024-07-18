@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  subwatcher:
+    build: .
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - RABBITMQ_URL=amqp://rabbitmq
+    command: python ./subwatcher.py ${DOMAIN} --stdout --telegram --rabbitmq
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
